@@ -1,0 +1,147 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #ffffff;
+  --color-panel: #f4f4f4;
+  --color-obsidian: #18191b;
+  --color-obsidian-card: #222324;
+  --color-ink: #434445;
+  --color-ink-strong: #1c1d1e;
+  --color-muted: #68696a;
+  --color-line: #dedede;
+  --color-amaan-gold: #f8b033;
+  --color-amaan-blue: #429ad4;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    background-color: #eaecf0;
+    color: #1c1d1e;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  html.dark {
+    background-color: #08090b;
+    color: #ffffff;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+}
+
+/* Tactile Architectural Background System: Grey-to-Black Depth + Subtle Amaanity Gold Texture */
+.studio-canvas-bg {
+  background-color: #ecedf0;
+  background-image:
+    radial-gradient(ellipse 90% 45% at 50% -5%, rgba(255, 255, 255, 0.85), transparent 68%),
+    radial-gradient(circle at 84% 16%, rgba(248, 176, 51, 0.13), transparent 46%),
+    radial-gradient(circle at 14% 72%, rgba(248, 176, 51, 0.065), transparent 48%),
+    linear-gradient(180deg, #f3f4f6 0%, #e7e9ee 38%, #dcdfe6 75%, #d3d7df 100%);
+}
+
+html.dark .studio-canvas-bg {
+  background-color: #07080a;
+  background-image:
+    radial-gradient(ellipse 85% 42% at 50% -4%, rgba(255, 255, 255, 0.075), transparent 65%),
+    radial-gradient(circle at 82% 16%, rgba(248, 176, 51, 0.11), transparent 48%),
+    radial-gradient(circle at 16% 62%, rgba(248, 176, 51, 0.055), transparent 46%),
+    linear-gradient(180deg, #2b2d32 0%, #1f2125 32%, #131417 65%, #07080a 100%);
+}
+
+.studio-dot-texture {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.24) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(28, 29, 30, 0.11) 1px, transparent 0);
+  background-size: 52px 52px, 26px 26px;
+  background-position: 13px 13px, 0 0;
+}
+
+html.dark .studio-dot-texture {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.22) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.085) 1px, transparent 0);
+  background-size: 52px 52px, 26px 26px;
+  background-position: 13px 13px, 0 0;
+}
+
+.studio-grain-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+.studio-dark-band {
+  background-color: #08090b;
+  background-image:
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(255, 255, 255, 0.075), transparent 65%),
+    radial-gradient(circle at 85% 22%, rgba(248, 176, 51, 0.11), transparent 44%),
+    radial-gradient(circle at 15% 78%, rgba(248, 176, 51, 0.055), transparent 46%),
+    linear-gradient(180deg, #2a2c31 0%, #1c1e22 42%, #0e0f12 78%, #07080a 100%);
+}
+
+.studio-dark-band-dots {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.21) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.075) 1px, transparent 0);
+  background-size: 52px 52px, 26px 26px;
+  background-position: 13px 13px, 0 0;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes studio-marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes studio-marquee-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: studio-marquee-left 44s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: studio-marquee-right 38s linear infinite;
+}
+
+.marquee-pausable:hover {
+  animation-play-state: paused;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, #000000 10%, #000000 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000000 10%, #000000 90%, transparent);
+}
