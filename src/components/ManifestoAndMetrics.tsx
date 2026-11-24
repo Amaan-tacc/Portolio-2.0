@@ -7,10 +7,14 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react';
-import { STUDIO_METRICS, TRUSTED_SECTORS } from '../data/studioData';
+import { DEFAULT_SITE_COPY, STUDIO_METRICS, TRUSTED_SECTORS } from '../data/studioData';
+import { StudioMetric } from '../types/studio';
 
-const MANIFESTO_TEXT =
-  'Clear briefs. Sharp direction. One team from first concept to final files—trusted by clients worldwide.';
+interface ManifestoAndMetricsProps {
+  manifestoText?: string;
+  metrics?: StudioMetric[];
+  sectors?: string[];
+}
 
 const ScrollRevealWord: React.FC<{
   word: string;
@@ -57,7 +61,11 @@ const AnimatedCounter: React.FC<{ target: number; suffix: string }> = ({ target,
   );
 };
 
-export const ManifestoAndMetrics: React.FC = () => {
+export const ManifestoAndMetrics: React.FC<ManifestoAndMetricsProps> = ({
+  manifestoText = DEFAULT_SITE_COPY.manifestoText,
+  metrics = STUDIO_METRICS,
+  sectors = TRUSTED_SECTORS,
+}) => {
   const manifestoRef = useRef<HTMLDivElement>(null);
   const cardsGridRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
@@ -95,13 +103,13 @@ export const ManifestoAndMetrics: React.FC = () => {
   const evenRotate = useTransform(smoothCardsProgress, [0, 1], [1.2, -1.2]);
   const marqueeDriftX = useTransform(smoothMarqueeScroll, [0, 1], [70, -120]);
 
-  const words = MANIFESTO_TEXT.split(' ');
+  const words = manifestoText.split(' ');
 
   return (
-    <section className="py-12 sm:py-22 bg-transparent overflow-x-clip transition-colors duration-500">
+    <section className="py-10 sm:py-20 bg-transparent overflow-x-clip transition-colors duration-500">
       <div className="max-w-[1380px] mx-auto px-4 sm:px-8">
-        <div ref={manifestoRef} className="max-w-5xl py-4">
-          <p className="text-[clamp(1.5rem,3.6vw,2.75rem)] font-light leading-[1.32] tracking-[-0.02em] text-[#1C1D1E] dark:text-white">
+        <div ref={manifestoRef} className="max-w-5xl py-2 sm:py-4">
+          <p className="text-[clamp(1.35rem,3.6vw,2.75rem)] font-light leading-[1.32] tracking-[-0.02em] text-[#1C1D1E] dark:text-white">
             {words.map((word, index) => {
               const start = index / words.length;
               const end = Math.min(1, start + 1.8 / words.length);
@@ -117,12 +125,12 @@ export const ManifestoAndMetrics: React.FC = () => {
           </p>
         </div>
 
-        {/* 4 Experience & 300+ Clients Cards */}
+        {/* 4 Experience & 300+ Clients Cards — Compact 2x2 on Mobile */}
         <div
           ref={cardsGridRef}
-          className="mt-12 sm:mt-20 mb-14 md:mb-28 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
+          className="mt-8 sm:mt-18 mb-10 sm:mb-24 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5"
         >
-          {STUDIO_METRICS.map((metric, index) => {
+          {metrics.map((metric, index) => {
             const isOddCol = index % 2 === 0;
             return (
               <motion.div
@@ -140,16 +148,18 @@ export const ManifestoAndMetrics: React.FC = () => {
                   opacity: { duration: 0.55, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] },
                   scale: { type: 'spring', stiffness: 300, damping: 22 },
                 }}
-                className={`rounded-[28px] sm:rounded-[30px] p-6 sm:p-8 text-[#1C1D1E] flex flex-col justify-between min-h-[225px] sm:min-h-[245px] will-change-transform shadow-sm hover:shadow-xl transition-shadow duration-300 ${metric.offsetClass}`}
+                className={`rounded-[22px] sm:rounded-[30px] p-4 sm:p-8 text-[#1C1D1E] flex flex-col justify-between min-h-[155px] sm:min-h-[240px] ring-1 ring-inset ring-white/45 will-change-transform shadow-sm hover:shadow-xl transition-shadow duration-300 ${metric.offsetClass}`}
               >
-                <div className="font-display text-[clamp(2.8rem,4.8vw,4.5rem)] font-bold leading-none tracking-[-0.04em]">
+                <div className="font-display text-[clamp(1.95rem,5.5vw,4.5rem)] font-bold leading-none tracking-[-0.04em]">
                   <AnimatedCounter target={metric.targetNumber} suffix={metric.suffix} />
                 </div>
 
                 <div>
-                  <div className="h-px w-full bg-black/18 mb-4" />
-                  <div className="text-base font-bold tracking-tight mb-1">{metric.label}</div>
-                  <p className="text-sm text-black/75 leading-snug">{metric.detail}</p>
+                  <div className="h-px w-full bg-black/18 mb-2.5 sm:mb-4" />
+                  <div className="text-xs sm:text-base font-bold tracking-tight mb-0.5 sm:mb-1">
+                    {metric.label}
+                  </div>
+                  <p className="text-[11px] sm:text-sm text-black/75 leading-snug">{metric.detail}</p>
                 </div>
               </motion.div>
             );
@@ -162,13 +172,16 @@ export const ManifestoAndMetrics: React.FC = () => {
         <div className="marquee-mask overflow-hidden py-3">
           <motion.div style={{ x: marqueeDriftX }} className="will-change-transform">
             <div className="animate-marquee-right marquee-pausable flex items-center gap-10 sm:gap-14 whitespace-nowrap">
-              {[...TRUSTED_SECTORS, ...TRUSTED_SECTORS].map((sector, idx) => (
+              {[...sectors, ...sectors].map((sector, idx) => (
                 <div
                   key={`${sector}-${idx}`}
-                  className="flex items-center gap-10 sm:gap-14 font-display text-lg sm:text-xl font-semibold tracking-tight text-[#434445] dark:text-white/75 hover:text-[#1C1D1E] dark:hover:text-white transition-colors"
+                  className="flex items-center gap-10 sm:gap-14 font-display text-lg sm:text-xl font-semibold tracking-tight text-[#434445] dark:text-white/75 hover:text-[#1C1D1E] dark:hover:text-white transition-colors duration-300 ease-out"
                 >
                   <span>{sector}</span>
-                  <span className="text-[#F8B033]" aria-hidden="true">
+                  <span
+                    className={idx % 2 === 0 ? 'text-[#F8B033]' : 'text-[#429AD4]'}
+                    aria-hidden="true"
+                  >
                     /
                   </span>
                 </div>
