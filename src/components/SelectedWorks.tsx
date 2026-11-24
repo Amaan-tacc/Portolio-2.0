@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   AnimatePresence,
   motion,
@@ -196,10 +196,66 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
   );
 
   const stripRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pauseUntil = useRef(0);
+  const hovering = useRef(false);
+  const focused = useRef(false);
   const drag = useRef({ active: false, start: 0, left: 0, moved: false });
+  const { scrollYProgress: reelScroll } = useScroll({
+    target: reelSectionRef,
+    offset: ['start end', 'end start'],
+  });
+  const smoothReelScroll = useSpring(reelScroll, { stiffness: 100, damping: 24 });
+  const reelShiftX = useTransform(smoothReelScroll, [0, 1], [-100, 100]);
+
+  useEffect(() => {
+    const strip = stripRef.current;
+    const track = trackRef.current;
+    if (!strip || !track) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = 0;
+    let last = 0;
+    let visible = false;
+    let cycle = 0;
+    let position = strip.scrollLeft;
+    // Cache dimensions rather than measuring layout on every animation frame.
+    const resize = new ResizeObserver(() => {
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      cycle = (track.scrollWidth + gap) / 2;
+    });
+    resize.observe(track);
+    const tick = (now: number) => {
+      const elapsed = last ? Math.min(now - last, 50) : 0;
+      last = now;
+      if (!reduced.matches && !hovering.current && !focused.current && !drag.current.active && now > pauseUntil.current && cycle > 0) {
+        position += elapsed * cycle / 44000;
+        if (position >= cycle) position %= cycle;
+        strip.scrollLeft = position;
+      } else {
+        position = strip.scrollLeft;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      cancelAnimationFrame(frame);
+      last = 0;
+      position = strip.scrollLeft;
+      if (visible && !document.hidden) frame = requestAnimationFrame(tick);
+    });
+    const onVisibility = () => {
+      cancelAnimationFrame(frame); last = 0;
+      if (visible && !document.hidden) frame = requestAnimationFrame(tick);
+    };
+    observer.observe(strip);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => { cancelAnimationFrame(frame); resize.disconnect(); observer.disconnect(); document.removeEventListener('visibilitychange', onVisibility); };
+  }, [reelGallery]);
+
   const scrollArchive = (direction: number) => {
     const el = stripRef.current;
-    if (el) el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: 'smooth' });
+    pauseUntil.current = performance.now() + 1800;
+    if (el) el.scrollBy({ left: direction * el.clientWidth * 0.65, behavior: 'smooth' });
   };
 
   const handleOpenById = (studyId: string) => {
@@ -312,21 +368,23 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
           </span>
         </div>
 
-        <div className="max-w-[1380px] mx-auto flex justify-end gap-2 px-4 sm:px-8 mb-2">
-          <button aria-label="Previous archive images" onClick={() => scrollArchive(-1)} className="rounded-full border border-current/20 px-4 py-2 hover:bg-[#F8B033] transition-colors">←</button>
-          <button aria-label="Next archive images" onClick={() => scrollArchive(1)} className="rounded-full border border-current/20 px-4 py-2 hover:bg-[#F8B033] transition-colors">→</button>
-        </div>
+        <div className="marquee-mask overflow-hidden py-3">
+          <motion.div style={{ x: reelShiftX }} className="will-change-transform">
         <div ref={stripRef} data-lenis-prevent role="region" aria-label="Project image gallery" tabIndex={0}
           onKeyDown={e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); scrollArchive(e.key === 'ArrowRight' ? 1 : -1); } }}
-          onPointerDown={e => { if (e.pointerType !== 'mouse' || e.button !== 0) return; drag.current = {active: true, start: e.clientX, left: e.currentTarget.scrollLeft, moved: false}; }}
+          onPointerEnter={e => { if (e.pointerType === 'mouse') hovering.current = true; }}
+          onFocusCapture={e => { focused.current = (e.target as HTMLElement).matches(':focus-visible'); }}
+          onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) focused.current = false; }}
+          onWheel={() => { pauseUntil.current = performance.now() + 1800; }}
+          onPointerDown={e => { pauseUntil.current = performance.now() + 60000; if (e.pointerType !== 'mouse' || e.button !== 0) return; drag.current = {active: true, start: e.clientX, left: e.currentTarget.scrollLeft, moved: false}; }}
           onPointerMove={e => { const d = drag.current; if (!d.active) return; const delta = e.clientX - d.start; if (Math.abs(delta) > 6) { d.moved = true; e.currentTarget.setPointerCapture(e.pointerId); e.currentTarget.scrollLeft = d.left - delta; } }}
-          onPointerUp={e => { drag.current.active = false; if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); }}
-          onPointerCancel={() => { drag.current.active = false; }}
-          onPointerLeave={() => { drag.current.active = false; }}
+          onPointerUp={e => { pauseUntil.current = performance.now() + 1800; drag.current.active = false; if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); }}
+          onPointerCancel={() => { pauseUntil.current = performance.now() + 1800; drag.current.active = false; }}
+          onPointerLeave={() => { hovering.current = false; drag.current.active = false; }}
           onClickCapture={e => { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); drag.current.moved = false; } }}
-          className="archive-scroll overflow-x-auto py-3 px-4 sm:px-8 cursor-grab active:cursor-grabbing select-none">
-            <div className="flex w-max items-stretch gap-3.5 sm:gap-5">
-              {reelGallery.map((item, idx) => (
+          className="archive-scroll overflow-x-auto cursor-grab active:cursor-grabbing select-none">
+            <div ref={trackRef} className="flex w-max items-stretch gap-3.5 sm:gap-5">
+              {[...reelGallery, ...reelGallery].map((item, idx) => (
                 <motion.button
                   key={`${item.id}-${idx}`}
                   type="button"
@@ -357,6 +415,8 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
                 </motion.button>
               ))}
             </div>
+        </div>
+          </motion.div>
         </div>
       </section>
     </>

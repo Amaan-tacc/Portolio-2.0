@@ -185,7 +185,8 @@ html.dark .studio-work-band-dots {
   -webkit-mask-image: linear-gradient(to right, transparent, #000000 10%, #000000 90%, transparent);
 }
 
-.archive-scroll { overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #F8B033 transparent; }
+.archive-scroll { overscroll-behavior-x: contain; scrollbar-width: none; }
+.archive-scroll::-webkit-scrollbar { display: none; }
 .archive-scroll img { -webkit-user-drag: none; }
 @media (max-width: 767px) {
   [class*="backdrop-blur"] { backdrop-filter: none; -webkit-backdrop-filter: none; }
