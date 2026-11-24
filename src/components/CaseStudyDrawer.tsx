@@ -1,3 +1,4 @@
+import { responsiveImage } from '../lib/responsiveImage';
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowUpRight, Check, X } from 'lucide-react';
@@ -125,6 +126,7 @@ export const CaseStudyDrawer: React.FC<CaseStudyDrawerProps> = ({
                       <motion.img
                         key={activeImage}
                         src={activeImage}
+                      {...responsiveImage(activeImage, '(min-width: 768px) 700px, 95vw')}
                         alt={`${study.title} view ${activeImageIdx + 1}`}
                         initial={{ opacity: 0, scale: 1.04 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -152,6 +154,7 @@ export const CaseStudyDrawer: React.FC<CaseStudyDrawerProps> = ({
                           <div className="w-full h-full rounded-lg overflow-hidden">
                             <img
                               src={imgUrl}
+                      {...responsiveImage(imgUrl, '(min-width: 768px) 130px, 22vw')}
                               alt={`${study.title} thumbnail ${idx + 1}`}
                               className={`w-full h-full object-cover transition-opacity duration-300 ${
                                 active ? 'opacity-100' : 'opacity-55 hover:opacity-90'

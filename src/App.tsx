@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import { motion, MotionConfig, useScroll, useSpring } from 'motion/react';
 import { Navbar } from './components/Navbar';
@@ -13,9 +13,9 @@ import { ManifestoAndMetrics } from './components/ManifestoAndMetrics';
 import { SelectedWorks } from './components/SelectedWorks';
 import { ExpertiseAndProcess } from './components/ExpertiseAndProcess';
 import { FooterCTA } from './components/FooterCTA';
-import { CaseStudyDrawer } from './components/CaseStudyDrawer';
-import { GuidedBriefModal } from './components/GuidedBriefModal';
-import { ShowreelModal } from './components/ShowreelModal';
+const CaseStudyDrawer = lazy(() => import('./components/CaseStudyDrawer').then(m => ({ default: m.CaseStudyDrawer })));
+const GuidedBriefModal = lazy(() => import('./components/GuidedBriefModal').then(m => ({ default: m.GuidedBriefModal })));
+const ShowreelModal = lazy(() => import('./components/ShowreelModal').then(m => ({ default: m.ShowreelModal })));
 const AdminPortal = lazy(() => import('./components/AdminPortal').then(m => ({ default: m.AdminPortal })));
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CASE_STUDIES, DEFAULT_SITE_CONTENT } from './data/studioData';
@@ -27,6 +27,12 @@ function isCurrentlyAdminRoute(): boolean {
   if (typeof window === 'undefined') return false;
   const path = window.location.pathname.replace(/\/+$/, '');
   return path === '/admin' || window.location.hash === '#/admin';
+}
+
+function useOpened(open: boolean) {
+  const [opened, setOpened] = useState(open);
+  useEffect(() => { if (open) setOpened(true); }, [open]);
+  return open || opened;
 }
 
 export default function App() {
@@ -50,6 +56,12 @@ export default function App() {
   const [briefOpen, setBriefOpen] = useState(false);
   const [showreelOpen, setShowreelOpen] = useState(false);
   const [prefilledNiche, setPrefilledNiche] = useState<NicheId | null>(null);
+  const briefMounted = useOpened(briefOpen);
+  const reelMounted = useOpened(showreelOpen);
+  const caseMounted = useOpened(selectedCaseStudy !== null);
+  const closeBrief = useCallback(() => setBriefOpen(false), []);
+  const closeReel = useCallback(() => setShowreelOpen(false), []);
+  const closeCase = useCallback(() => setSelectedCaseStudy(null), []);
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
@@ -91,6 +103,23 @@ export default function App() {
     }, 100);
     return () => { disposed = true; window.clearTimeout(timer); cleanup(); };
   }, []);
+
+  // CSS effects keep their exact styling/timing; invisible loops need no GPU work.
+  useEffect(() => {
+    if (isAdminRoute) return;
+    const elements = document.querySelectorAll<HTMLElement>('.animate-marquee-left, .animate-marquee-right, .animate-ping');
+    const visibility = new Map<Element, boolean>();
+    const sync = () => elements.forEach(el => {
+      el.dataset.animationVisible = String(!document.hidden && visibility.get(el) === true);
+    });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => visibility.set(entry.target, entry.isIntersecting));
+      sync();
+    }, { rootMargin: '150px' });
+    elements.forEach(el => observer.observe(el));
+    document.addEventListener('visibilitychange', sync);
+    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', sync); };
+  }, [isAdminRoute]);
 
   // Smooth inertial momentum scrolling on the public portfolio only
   useEffect(() => {
@@ -255,27 +284,33 @@ export default function App() {
               onOpenBrief={() => handleOpenBrief()}
             />
 
-            <ShowreelModal
+            <Suspense fallback={null}>
+            {reelMounted && <ShowreelModal
               isOpen={showreelOpen}
-              onClose={() => setShowreelOpen(false)}
+              onClose={closeReel}
               onStartProject={(niche) => handleOpenBrief(niche)}
               brand={siteContent.brand}
               services={siteContent.services}
-            />
+            />}
 
-            <CaseStudyDrawer
+            </Suspense>
+            <Suspense fallback={null}>
+            {caseMounted && <CaseStudyDrawer
               study={selectedCaseStudy}
-              onClose={() => setSelectedCaseStudy(null)}
+              onClose={closeCase}
               onRequestSimilar={(niche) => handleOpenBrief(niche)}
-            />
+            />}
 
-            <GuidedBriefModal
+            </Suspense>
+            <Suspense fallback={null}>
+            {briefMounted && <GuidedBriefModal
               isOpen={briefOpen}
               prefilledNiche={prefilledNiche}
-              onClose={() => setBriefOpen(false)}
+              onClose={closeBrief}
               brand={siteContent.brand}
               services={siteContent.services}
-            />
+            />}
+            </Suspense>
           </div>
         )}
       </MotionConfig>

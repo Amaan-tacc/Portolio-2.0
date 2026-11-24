@@ -1,3 +1,4 @@
+import { responsiveImage } from '../lib/responsiveImage';
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, Pause, Play, RotateCcw, X } from 'lucide-react';
@@ -147,6 +148,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
                     <div className="absolute right-3 sm:right-10 bottom-0 top-6 sm:top-10 flex items-end justify-end pointer-events-none opacity-35 sm:opacity-90">
                       <img
                         src={brand.founderAvatar}
+                      {...responsiveImage(brand.founderAvatar, '(min-width: 640px) 360px, 200px')}
                         alt={brand.founderName}
                         className="h-full max-h-[92%] w-auto object-contain object-bottom drop-shadow-2xl"
                       />

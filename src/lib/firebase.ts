@@ -1,15 +1,13 @@
-import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { doc, getDocFromServer, getFirestore } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { doc, getDocFromServer } from 'firebase/firestore';
+import { firebaseApp, db } from './firebaseDb';
+export { db } from './firebaseDb';
+export { ADMIN_EMAILS } from './adminAccess';
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const auth = getAuth(app);
+export const auth = getAuth(firebaseApp);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export const ADMIN_EMAILS = ['amaanityofficial@gmail.com', 'amaan@amaanity.com', 'hafizamaan18@gmail.com'];
 
 export enum OperationType {
   CREATE = 'create',

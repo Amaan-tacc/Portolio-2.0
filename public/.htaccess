@@ -21,3 +21,15 @@ ExpiresByType image/png "access plus 1 month"
 ExpiresByType image/jpeg "access plus 1 month"
 ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>
+
+<IfModule mod_headers.c>
+<FilesMatch "^(?:index|AdminPortal|studioCms|firebase|CaseStudyDrawer|GuidedBriefModal|ShowreelModal)-[A-Za-z0-9_-]+\.(?:js|css)$">
+Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+<FilesMatch "^[a-f0-9]{16}-[0-9]+\.webp$">
+Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+<FilesMatch "^(?:index\.html|robots\.txt|sitemap\.xml)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+</IfModule>

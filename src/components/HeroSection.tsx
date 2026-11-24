@@ -1,3 +1,4 @@
+import { responsiveImage } from '../lib/responsiveImage';
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, ArrowUpRight, Play } from 'lucide-react';
@@ -188,6 +189,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="absolute inset-0 flex items-end justify-center sm:justify-end sm:pr-14 lg:pr-24 pt-8 sm:pt-12 px-6 pointer-events-none">
               <img
                 src={brand.founderAvatar}
+                      {...responsiveImage(brand.founderAvatar, '(min-width: 640px) 450px, 240px')}
                 alt={`${brand.founderName} introducing ${brand.fullName} services`}
                 className="h-full max-h-[86%] w-auto object-contain object-bottom opacity-85 sm:opacity-95 transition-transform duration-700 ease-out group-hover:scale-[1.03] drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)]"
               />

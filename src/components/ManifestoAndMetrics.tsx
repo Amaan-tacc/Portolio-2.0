@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   motion,
   MotionValue,
@@ -33,30 +33,34 @@ const ScrollRevealWord: React.FC<{
 const AnimatedCounter: React.FC<{ target: number; suffix: string }> = ({ target, suffix }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
-  const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!isInView) return;
     let frame = 0;
+    let frameId = 0;
+    let lastCount = -1;
     const totalFrames = 64; // Half-speed smooth count up
     const step = () => {
       frame += 1;
       const progress = 1 - Math.pow(1 - frame / totalFrames, 3);
-      setCount(Math.round(target * progress));
+      const nextCount = Math.round(target * progress);
+      if (nextCount !== lastCount && ref.current) {
+        ref.current.textContent = `${nextCount}${suffix}`;
+        lastCount = nextCount;
+      }
       if (frame < totalFrames) {
-        requestAnimationFrame(step);
+        frameId = requestAnimationFrame(step);
       } else {
-        setCount(target);
+        if (ref.current) ref.current.textContent = `${target}${suffix}`;
       }
     };
-    const id = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(id);
-  }, [isInView, target]);
+    frameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frameId);
+  }, [isInView, target, suffix]);
 
   return (
     <span ref={ref} className="tabular-nums">
-      {count}
-      {suffix}
+      0{suffix}
     </span>
   );
 };

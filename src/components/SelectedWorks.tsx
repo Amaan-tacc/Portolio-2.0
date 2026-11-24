@@ -1,7 +1,9 @@
+import { responsiveImage } from '../lib/responsiveImage';
 import React, { useEffect, useRef } from 'react';
 import {
   AnimatePresence,
   motion,
+  useInView,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -47,6 +49,8 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
 }) => {
   const isLast = index === total - 1;
   const reducedMotion = useReducedMotion();
+  const layerRef = useRef<HTMLElement>(null);
+  const nearViewport = useInView(layerRef, { margin: "400px 0px" });
 
   // Measure the NEXT card's non-sticky top marker entering from below over this card.
   // Scrolling up immediately lowers overlapProgress and restores full 100% brightness & scale.
@@ -82,7 +86,8 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
         }}
       >
         <motion.article
-          style={{ scale, opacity, y: cardY, filter }}
+          ref={layerRef}
+          style={{ scale, opacity, y: cardY, filter, willChange: nearViewport ? "transform, filter" : "auto" }}
           className="group rounded-[22px] md:rounded-[40px] bg-white/92 dark:bg-[#1E1F23]/90 backdrop-blur-2xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/95 dark:ring-white/10 overflow-hidden shadow-[0_22px_55px_-12px_rgba(28,29,30,0.14)] dark:shadow-[0_26px_65px_rgba(0,0,0,0.58)] origin-top will-change-transform hover:border-black/22 dark:hover:border-white/28 transition-colors duration-300"
         >
           <motion.div
@@ -164,6 +169,7 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
                 <motion.img
                   style={{ y: imageY, scale: imageScale }}
                   src={study.heroImage}
+                      {...responsiveImage(study.heroImage, '(min-width: 1024px) 55vw, 95vw')}
                   alt={`${study.title} — ${study.roleTag}`}
                   loading="lazy"
                   className="w-full h-[112%] -mt-[4%] object-cover will-change-transform transition-transform duration-700 ease-out group-hover:scale-105"
@@ -403,9 +409,9 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
                   <div className="relative w-full h-full rounded-[14px] sm:rounded-[20px] overflow-hidden bg-[#141518]">
                     <img
                       src={item.image}
+                      {...responsiveImage(item.image, '(min-width: 640px) 330px, 200px')}
                       alt={item.title}
                       draggable={false}
-                      decoding="async"
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                     />

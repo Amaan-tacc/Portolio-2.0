@@ -1,4 +1,4 @@
-import { User } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import {
   collection,
   deleteDoc,
@@ -21,12 +21,14 @@ import {
   NicheId,
   SiteContentBundle,
 } from '../types/studio';
-import {
-  ADMIN_EMAILS,
-  db,
-  handleFirestoreError,
-  OperationType,
-} from './firebase';
+import { db } from './firebaseDb';
+import { ADMIN_EMAILS } from './adminAccess';
+
+async function reportFirestoreError(error: unknown, operation: 'WRITE' | 'DELETE' | 'LIST', path: string): Promise<never> {
+  const { handleFirestoreError, OperationType } = await import('./firebase');
+  return handleFirestoreError(error, OperationType[operation], path);
+}
+
 
 const VALID_NICHES: NicheId[] = [
   'brand-identity',
@@ -264,7 +266,7 @@ export async function saveSiteContent(
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+    return await reportFirestoreError(error, 'WRITE', path);
   }
 }
 
@@ -278,7 +280,7 @@ export async function saveProject(project: CaseStudy): Promise<CaseStudy> {
     });
     return normalized;
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+    return await reportFirestoreError(error, 'WRITE', path);
   }
 }
 
@@ -288,7 +290,7 @@ export async function deleteProject(projectId: string): Promise<void> {
   try {
     await deleteDoc(doc(db, 'projects', safeId));
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+    return await reportFirestoreError(error, 'DELETE', path);
   }
 }
 
@@ -308,7 +310,7 @@ export async function seedDefaultsToFirestore(uid: string): Promise<void> {
 export async function forceRestoreAllDefaults(uid: string): Promise<void> {
   await saveSiteContent(DEFAULT_SITE_CONTENT, uid);
   const currentDocs = await getDocs(collection(db, 'projects')).catch((err) =>
-    handleFirestoreError(err, OperationType.LIST, 'projects')
+    reportFirestoreError(err, 'LIST', 'projects')
   );
   const defaultIds = new Set(CASE_STUDIES.map((s) => s.id));
   await Promise.all([

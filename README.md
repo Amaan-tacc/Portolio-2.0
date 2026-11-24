@@ -55,3 +55,11 @@ During login, choose the project owner account. Review `firestore.rules` before 
 5. Open https://amaanity.com/admin and sign in as `hafizamaan18@gmail.com`. This email is already allowed in both the frontend and the checked-in rules. First authorized sign-in seeds bundled content only when the corresponding documents/collections are missing. Check an edit and reload to verify persistence.
 
 Project UI update: restored the original overlap blur, mobile glass/grain and scrolling effects. Expanded project, brief and showreel panels bypass the background Lenis handler and scroll independently.
+
+## Performance optimization (effects retained)
+
+Responsive `srcset` images preserve all original files and let browsers choose 480/960/1440px copies when appropriate. `scripts/optimize-images.py` (Python + Pillow) regenerates the content-hashed copies and manifest after bundled artwork changes. Current content: 56 mapped images, 119 deduplicated variants. Across the 35 unique bundled portfolio image references, the available 480px copies total 1,210,266 bytes versus 7,094,100 bytes for originals (82.9% smaller). Actual device selection depends on layout and pixel density; this is an asset-size comparison, not a measured page-speed percentage.
+
+Project, brief and showreel modules load on demand and remain mounted after first use, preserving entry/exit animations and state. The public CMS database connection no longer initializes Google admin sign-in. CMS remains live-subscribed. Counters update their own text nodes; invisible decorative CSS loops pause and resume when visible. Fixed textures get compositor layers, and project blur layers are allocated near the viewport without changing the blur/overlap values. Hashed bundles and responsive copies are cached immutably; HTML revalidates.
+
+Build/type checks and responsive-image candidate validation passed. Checked mobile/light and desktop/dark rendering, gallery auto-scroll and manual navigation, project drawer scrolling and image loading, brief open/close, showreel playback and page scrolling after overlays close. No visual effect, portfolio item, original image or interaction was removed. Device-specific frame-rate gains are not claimed without real-device profiling.

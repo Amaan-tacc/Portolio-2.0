@@ -1,3 +1,4 @@
+import { responsiveImage } from '../lib/responsiveImage';
 import React, { useRef, useState } from 'react';
 import {
   AnimatePresence,
@@ -205,6 +206,7 @@ export const ExpertiseAndProcess: React.FC<ExpertiseAndProcessProps> = ({
                   <motion.img
                     style={{ y: avatarImgY }}
                     src={brand.founderAvatar}
+                      {...responsiveImage(brand.founderAvatar, '(min-width: 640px) 275px, 205px')}
                     alt={`${brand.founderName}, founder of ${brand.name}`}
                     loading="lazy"
                     className="relative z-10 w-full h-full object-contain object-bottom will-change-transform drop-shadow-md"
