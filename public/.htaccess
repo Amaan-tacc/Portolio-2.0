@@ -12,6 +12,7 @@ RewriteRule ^work(?:/index\.html)?/?$ /#work [R=301,L,NE]
 RewriteRule ^services(?:/.*)?$ /#specialties [R=301,L,NE]
 RewriteRule ^projects(?:/.*)?$ /#work [R=301,L,NE]
 RewriteRule ^project(?:/index\.html)?/?$ /#work [R=301,L,NE,QSD]
+RewriteRule ^admin/?$ index.html [L]
 </IfModule>
 <IfModule mod_expires.c>
 ExpiresActive On
