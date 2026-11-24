@@ -188,10 +188,6 @@ html.dark .studio-work-band-dots {
 .archive-scroll { overscroll-behavior-x: contain; scrollbar-width: none; }
 .archive-scroll::-webkit-scrollbar { display: none; }
 .archive-scroll img { -webkit-user-drag: none; }
-@media (max-width: 767px) {
-  [class*="backdrop-blur"] { backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .studio-grain-texture { display: none; }
-}
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee-left, .animate-marquee-right { animation: none; }
 }

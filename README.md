@@ -37,3 +37,21 @@ The esbuild dependency was aligned with Vite 8's supported peer range. Device li
 - Archive uses native horizontal overflow for touch, mouse dragging, arrow buttons and keyboard navigation. Decorative duplicated images/competing translations were removed.
 - Initial JS split from Firebase CMS and the admin editor. Mobile uses native vertical scrolling; costly backdrop filters and per-card animated blur were reduced.
 - `hafizamaan18@gmail.com` is included in both the frontend admin allowlist and `firestore.rules`. The project owner must publish the updated rules in Firebase for database writes to be authorized. Updating Hostinger alone does not publish Firestore rules.
+
+## Firebase owner setup
+
+1. Sign into https://console.firebase.google.com/ using the account that owns project `juicy-arcade-9bpf3`.
+2. In Authentication > Sign-in method, enable Google and choose your support email. In Authentication > Settings > Authorized domains, add `amaanity.com` (without https or a path).
+3. This site connects to the existing named Firestore database `ai-studio-amaanitystudio-1c48d484-8409-4e0c-a349-cf1cb06ef97b`, not `(default)`. Preserve its current data. The checked-in `firebase.json` targets only this database.
+4. To publish the repository rules, pull this repository, open a terminal in its root, and run:
+
+```sh
+npx firebase-tools login --reauth
+npx firebase-tools deploy --only firestore:ai-studio-amaanitystudio-1c48d484-8409-4e0c-a349-cf1cb06ef97b --project juicy-arcade-9bpf3
+```
+
+During login, choose the project owner account. Review `firestore.rules` before publishing. No service-account key is needed. Only the selected database's rules are deployed; the website remains on Hostinger.
+
+5. Open https://amaanity.com/admin and sign in as `hafizamaan18@gmail.com`. This email is already allowed in both the frontend and the checked-in rules. First authorized sign-in seeds bundled content only when the corresponding documents/collections are missing. Check an edit and reload to verify persistence.
+
+Project UI update: restored the original overlap blur, mobile glass/grain and scrolling effects. Expanded project, brief and showreel panels bypass the background Lenis handler and scroll independently.

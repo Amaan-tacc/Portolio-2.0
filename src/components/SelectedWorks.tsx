@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {
   AnimatePresence,
   motion,
+  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
@@ -45,6 +46,7 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
   onRequestSimilar,
 }) => {
   const isLast = index === total - 1;
+  const reducedMotion = useReducedMotion();
 
   // Measure the NEXT card's non-sticky top marker entering from below over this card.
   // Scrolling up immediately lowers overlapProgress and restores full 100% brightness & scale.
@@ -56,6 +58,11 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
   const scale = useTransform(overlapProgress, [0, 1], [1, isLast ? 1 : 0.94]);
   const opacity = useTransform(overlapProgress, [0, 0.35, 1], [1, 1, isLast ? 1 : 0.84]);
   const cardY = useTransform(overlapProgress, [0, 1], [0, isLast ? 0 : -12]);
+  const filter = useTransform(overlapProgress, value => {
+    if (isLast || reducedMotion) return 'blur(0px)';
+    const amount = Math.max(0, (value - 0.12) / 0.88) * 10;
+    return `blur(${amount.toFixed(2)}px)`;
+  });
   const imageScale = useTransform(overlapProgress, [0, 1], [1.05, 1]);
   const imageY = useTransform(overlapProgress, [0, 1], [-10, 12]);
 
@@ -75,7 +82,7 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
         }}
       >
         <motion.article
-          style={{ scale, opacity, y: cardY }}
+          style={{ scale, opacity, y: cardY, filter }}
           className="group rounded-[22px] md:rounded-[40px] bg-white/92 dark:bg-[#1E1F23]/90 backdrop-blur-2xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/95 dark:ring-white/10 overflow-hidden shadow-[0_22px_55px_-12px_rgba(28,29,30,0.14)] dark:shadow-[0_26px_65px_rgba(0,0,0,0.58)] origin-top will-change-transform hover:border-black/22 dark:hover:border-white/28 transition-colors duration-300"
         >
           <motion.div

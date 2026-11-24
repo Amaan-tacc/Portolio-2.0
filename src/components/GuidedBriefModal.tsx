@@ -214,7 +214,9 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 18 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] sm:rounded-[28px] bg-white/88 dark:bg-[#191B1E]/88 backdrop-blur-2xl text-[#1C1D1E] dark:text-white shadow-2xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/45 dark:ring-white/10"
+            data-lenis-prevent
+            tabIndex={-1}
+            className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto overscroll-contain [touch-action:pan-y] rounded-[24px] sm:rounded-[28px] bg-white/88 dark:bg-[#191B1E]/88 backdrop-blur-2xl text-[#1C1D1E] dark:text-white shadow-2xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/45 dark:ring-white/10"
           >
             {/* Translucent Header */}
             <div className="sticky top-0 z-20 bg-white/72 dark:bg-[#191B1E]/74 backdrop-blur-2xl px-4 sm:px-8 py-3.5 sm:py-5 border-b border-black/10 dark:border-white/10 flex items-center justify-between gap-4">

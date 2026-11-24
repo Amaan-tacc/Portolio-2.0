@@ -61,10 +61,13 @@ export const CaseStudyDrawer: React.FC<CaseStudyDrawerProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 300 }}
-            className="relative z-10 w-full max-w-3xl bg-white/86 dark:bg-[#181A1E]/88 backdrop-blur-2xl text-[#1C1D1E] dark:text-white h-full overflow-y-auto shadow-2xl flex flex-col border-l border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/40 dark:ring-white/10"
+            data-lenis-prevent
+            data-project-scroll
+            tabIndex={-1}
+            className="relative z-10 w-full max-w-3xl bg-white/86 dark:bg-[#181A1E]/88 backdrop-blur-2xl text-[#1C1D1E] dark:text-white h-[100dvh] min-h-0 overflow-y-auto overscroll-contain [touch-action:pan-y] shadow-2xl flex flex-col border-l border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/40 dark:ring-white/10"
           >
             {/* Translucent Sticky Header */}
-            <div className="sticky top-0 z-20 bg-white/70 dark:bg-[#181A1E]/72 backdrop-blur-2xl border-b border-black/10 dark:border-white/10 px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between gap-4">
+            <div className="shrink-0 sticky top-0 z-20 bg-white/70 dark:bg-[#181A1E]/72 backdrop-blur-2xl border-b border-black/10 dark:border-white/10 px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between gap-4">
               <div className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#68696A] dark:text-white/55 truncate">
                 {study.indexNumber} · {study.nicheLabel} · {study.client}
               </div>
@@ -238,7 +241,7 @@ export const CaseStudyDrawer: React.FC<CaseStudyDrawerProps> = ({
             </div>
 
             {/* Translucent Sticky Bottom Conversion CTA */}
-            <div className="sticky bottom-0 bg-white/70 dark:bg-[#181A1E]/72 backdrop-blur-2xl border-t border-black/10 dark:border-white/10 px-4 sm:px-8 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <div className="shrink-0 sticky bottom-0 bg-white/70 dark:bg-[#181A1E]/72 backdrop-blur-2xl border-t border-black/10 dark:border-white/10 px-4 sm:px-8 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
               <div className="text-xs sm:text-sm text-[#68696A] dark:text-white/60">
                 Want similar production craft?
               </div>

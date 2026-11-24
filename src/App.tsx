@@ -96,7 +96,7 @@ export default function App() {
   useEffect(() => {
     if (isAdminRoute) return;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion || window.matchMedia('(pointer: coarse)').matches) return;
+    if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
       lerp: 0.082,

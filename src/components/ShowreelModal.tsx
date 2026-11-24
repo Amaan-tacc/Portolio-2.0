@@ -101,7 +101,9 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 14 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-full max-w-5xl max-h-[92vh] overflow-y-auto rounded-[24px] sm:rounded-[28px] bg-[#16181C]/90 backdrop-blur-2xl border border-white/15 ring-1 ring-inset ring-white/12 shadow-2xl text-white flex flex-col"
+            data-lenis-prevent
+            tabIndex={-1}
+            className="relative z-10 w-full max-w-5xl max-h-[92vh] overflow-y-auto overscroll-contain [touch-action:pan-y] rounded-[24px] sm:rounded-[28px] bg-[#16181C]/90 backdrop-blur-2xl border border-white/15 ring-1 ring-inset ring-white/12 shadow-2xl text-white flex flex-col"
           >
             {/* Top Bar */}
             <div className="flex items-center justify-between gap-4 px-4 sm:px-7 py-3.5 sm:py-4 bg-white/[0.04] backdrop-blur-2xl border-b border-white/10">
