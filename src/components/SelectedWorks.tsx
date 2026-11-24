@@ -231,6 +231,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
     let visible = false;
     let cycle = 0;
     let position = strip.scrollLeft;
+    let speed = 1;
     // Cache dimensions rather than measuring layout on every animation frame.
     const resize = new ResizeObserver(() => {
       const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
@@ -240,8 +241,14 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
     const tick = (now: number) => {
       const elapsed = last ? Math.min(now - last, 50) : 0;
       last = now;
-      if (!reduced.matches && !hovering.current && !focused.current && !drag.current.active && now > pauseUntil.current && cycle > 0) {
-        position += elapsed * cycle / 44000;
+      // Ease between speeds independently of frame rate; hovering never stops the reel.
+      const targetSpeed = hovering.current ? 0.4 : 1;
+      const previousSpeed = speed;
+      const decay = Math.exp(-elapsed / 280);
+      speed = targetSpeed + (previousSpeed - targetSpeed) * decay;
+      const distanceTime = targetSpeed * elapsed + (previousSpeed - targetSpeed) * 280 * (1 - decay);
+      if (!reduced.matches && !focused.current && !drag.current.active && now > pauseUntil.current && cycle > 0) {
+        position += distanceTime * cycle / 44000;
         if (position >= cycle) position %= cycle;
         strip.scrollLeft = position;
       } else {

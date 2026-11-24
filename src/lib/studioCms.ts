@@ -262,7 +262,8 @@ export async function saveSiteContent(
   try {
     await setDoc(doc(db, 'site_content', 'main'), {
       ...normalized,
-      updatedBy: sanitizeId(uid),
+      // Firebase UIDs are case-sensitive identities, not project slugs.
+      updatedBy: uid,
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
