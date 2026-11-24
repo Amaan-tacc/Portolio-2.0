@@ -56,11 +56,6 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
   const scale = useTransform(overlapProgress, [0, 1], [1, isLast ? 1 : 0.94]);
   const opacity = useTransform(overlapProgress, [0, 0.35, 1], [1, 1, isLast ? 1 : 0.84]);
   const cardY = useTransform(overlapProgress, [0, 1], [0, isLast ? 0 : -12]);
-  const filter = useTransform(overlapProgress, (v) => {
-    if (isLast) return 'blur(0px)';
-    const blurAmount = Math.max(0, (v - 0.12) / 0.88) * 10;
-    return `blur(${blurAmount.toFixed(2)}px)`;
-  });
   const imageScale = useTransform(overlapProgress, [0, 1], [1.05, 1]);
   const imageY = useTransform(overlapProgress, [0, 1], [-10, 12]);
 
@@ -80,7 +75,7 @@ const StackedProjectCard: React.FC<StackedProjectCardProps> = ({
         }}
       >
         <motion.article
-          style={{ scale, opacity, y: cardY, filter }}
+          style={{ scale, opacity, y: cardY }}
           className="group rounded-[22px] md:rounded-[40px] bg-white/92 dark:bg-[#1E1F23]/90 backdrop-blur-2xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/95 dark:ring-white/10 overflow-hidden shadow-[0_22px_55px_-12px_rgba(28,29,30,0.14)] dark:shadow-[0_26px_65px_rgba(0,0,0,0.58)] origin-top will-change-transform hover:border-black/22 dark:hover:border-white/28 transition-colors duration-300"
         >
           <motion.div
@@ -200,12 +195,12 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
     [filteredStudies]
   );
 
-  const { scrollYProgress: reelScroll } = useScroll({
-    target: reelSectionRef,
-    offset: ['start end', 'end start'],
-  });
-  const smoothReelScroll = useSpring(reelScroll, { stiffness: 100, damping: 24 });
-  const reelShiftX = useTransform(smoothReelScroll, [0, 1], [-100, 100]);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const drag = useRef({ active: false, start: 0, left: 0, moved: false });
+  const scrollArchive = (direction: number) => {
+    const el = stripRef.current;
+    if (el) el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: 'smooth' });
+  };
 
   const handleOpenById = (studyId: string) => {
     const match = projects.find((c) => c.id === studyId) ?? projects[0];
@@ -317,10 +312,21 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
           </span>
         </div>
 
-        <div className="marquee-mask overflow-hidden py-3">
-          <motion.div style={{ x: reelShiftX }} className="will-change-transform">
-            <div className="animate-marquee-left marquee-pausable flex items-stretch gap-3.5 sm:gap-5">
-              {[...reelGallery, ...reelGallery].map((item, idx) => (
+        <div className="max-w-[1380px] mx-auto flex justify-end gap-2 px-4 sm:px-8 mb-2">
+          <button aria-label="Previous archive images" onClick={() => scrollArchive(-1)} className="rounded-full border border-current/20 px-4 py-2 hover:bg-[#F8B033] transition-colors">←</button>
+          <button aria-label="Next archive images" onClick={() => scrollArchive(1)} className="rounded-full border border-current/20 px-4 py-2 hover:bg-[#F8B033] transition-colors">→</button>
+        </div>
+        <div ref={stripRef} data-lenis-prevent role="region" aria-label="Project image gallery" tabIndex={0}
+          onKeyDown={e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); scrollArchive(e.key === 'ArrowRight' ? 1 : -1); } }}
+          onPointerDown={e => { if (e.pointerType !== 'mouse' || e.button !== 0) return; drag.current = {active: true, start: e.clientX, left: e.currentTarget.scrollLeft, moved: false}; }}
+          onPointerMove={e => { const d = drag.current; if (!d.active) return; const delta = e.clientX - d.start; if (Math.abs(delta) > 6) { d.moved = true; e.currentTarget.setPointerCapture(e.pointerId); e.currentTarget.scrollLeft = d.left - delta; } }}
+          onPointerUp={e => { drag.current.active = false; if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); }}
+          onPointerCancel={() => { drag.current.active = false; }}
+          onPointerLeave={() => { drag.current.active = false; }}
+          onClickCapture={e => { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); drag.current.moved = false; } }}
+          className="archive-scroll overflow-x-auto py-3 px-4 sm:px-8 cursor-grab active:cursor-grabbing select-none">
+            <div className="flex w-max items-stretch gap-3.5 sm:gap-5">
+              {reelGallery.map((item, idx) => (
                 <motion.button
                   key={`${item.id}-${idx}`}
                   type="button"
@@ -333,6 +339,8 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
                     <img
                       src={item.image}
                       alt={item.title}
+                      draggable={false}
+                      decoding="async"
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                     />
@@ -349,7 +357,6 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({
                 </motion.button>
               ))}
             </div>
-          </motion.div>
         </div>
       </section>
     </>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import { motion, MotionConfig, useScroll, useSpring } from 'motion/react';
 import { Navbar } from './components/Navbar';
@@ -16,11 +16,9 @@ import { FooterCTA } from './components/FooterCTA';
 import { CaseStudyDrawer } from './components/CaseStudyDrawer';
 import { GuidedBriefModal } from './components/GuidedBriefModal';
 import { ShowreelModal } from './components/ShowreelModal';
-import { AdminPortal } from './components/AdminPortal';
+const AdminPortal = lazy(() => import('./components/AdminPortal').then(m => ({ default: m.AdminPortal })));
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CASE_STUDIES, DEFAULT_SITE_CONTENT } from './data/studioData';
-import { testConnection } from './lib/firebase';
-import { subscribeToProjects, subscribeToSiteContent } from './lib/studioCms';
 import { CaseStudy, NicheId, SiteContentBundle } from './types/studio';
 
 const THEME_STORAGE_KEY = 'amaanity_theme_mode';
@@ -81,24 +79,24 @@ export default function App() {
 
   // Verify Firestore connection and subscribe to live CMS documents
   useEffect(() => {
-    testConnection();
-    const unsubContent = subscribeToSiteContent((content) => {
-      setSiteContent(content);
-    });
-    const unsubProjects = subscribeToProjects((nextProjects) => {
-      setProjects(nextProjects);
-    });
-    return () => {
-      unsubContent();
-      unsubProjects();
-    };
+    let disposed = false;
+    let cleanup = () => {};
+    const timer = window.setTimeout(() => {
+      import('./lib/studioCms').then(cms => {
+        if (disposed) return;
+        const a = cms.subscribeToSiteContent(setSiteContent);
+        const b = cms.subscribeToProjects(setProjects);
+        cleanup = () => { a(); b(); };
+      }).catch(error => console.warn('Using bundled studio content.', error));
+    }, 100);
+    return () => { disposed = true; window.clearTimeout(timer); cleanup(); };
   }, []);
 
   // Smooth inertial momentum scrolling on the public portfolio only
   useEffect(() => {
     if (isAdminRoute) return;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || window.matchMedia('(pointer: coarse)').matches) return;
 
     const lenis = new Lenis({
       lerp: 0.082,
@@ -176,13 +174,13 @@ export default function App() {
     <ErrorBoundary>
       <MotionConfig reducedMotion="user">
         {isAdminRoute ? (
-          <AdminPortal
+          <Suspense fallback={<div className="p-8">Loading studio…</div>}><AdminPortal
             isDark={isDark}
             onToggleDark={() => setIsDark((prev) => !prev)}
             siteContent={siteContent}
             projects={projects}
             onNavigateHome={navigateHome}
-          />
+          /></Suspense>
         ) : (
           <div className="relative min-h-screen studio-canvas-bg text-[#1C1D1E] dark:text-white selection:bg-[#F8B033] selection:text-[#1C1D1E] transition-colors duration-500">
             {/* Global Textured Dot-Grid & Matte Film Grain Overlays */}

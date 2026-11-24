@@ -31,6 +31,7 @@ service cloud.firestore {
       return isVerified() && (
         request.auth.token.email == 'amaanityofficial@gmail.com'
         || request.auth.token.email == 'amaan@amaanity.com'
+        || request.auth.token.email == 'hafizamaan18@gmail.com'
       );
     }
 

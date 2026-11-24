@@ -226,6 +226,16 @@ export const ExpertiseAndProcess: React.FC<ExpertiseAndProcessProps> = ({
                 {copy.aboutBody}
               </p>
 
+              <div className="flex flex-wrap justify-center lg:justify-start gap-x-5 gap-y-3 text-sm font-medium">
+                {[
+                  ['Email', `mailto:${brand.email}`], ['LinkedIn', brand.linkedinUrl],
+                  ['Instagram', brand.instagramUrl], ['YouTube', 'https://www.youtube.com/@amaanity'],
+                  ['WhatsApp', brand.whatsappUrl],
+                ].map(([label, href]) => (
+                  <a key={label} href={href} target={label === 'Email' ? undefined : '_blank'} rel="noreferrer" className="text-[#1D6FA5] dark:text-[#F8B033] hover:underline underline-offset-4 transition-opacity hover:opacity-75">{label === 'Email' ? brand.email : label}</a>
+                ))}
+              </div>
+
               <div className="pt-3 sm:pt-4 border-t border-black/10 dark:border-white/12 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1.5 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#68696A] dark:text-white/50">
                 <span className="inline-flex items-center gap-1.5 text-[#429AD4]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#429AD4]" aria-hidden="true" />

@@ -59,6 +59,8 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
     customBudget?: string;
   }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [sendState, setSendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [sendError, setSendError] = useState('');
   const [copiedSummary, setCopiedSummary] = useState(false);
 
   useEffect(() => {
@@ -135,6 +137,8 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
     }
 
     setErrors({});
+    setSendState('idle');
+    setSendError('');
     setSubmitted(true);
   };
 
@@ -159,9 +163,23 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
     .filter(Boolean)
     .join('\n');
 
-  const mailtoHref = `mailto:${brand.email}?subject=${encodeURIComponent(
-    `Project Brief — ${selectedLabels || 'Design Inquiry'} (${form.name})`
-  )}&body=${encodeURIComponent(formattedBriefText)}`;
+  const handleSendBrief = async () => {
+    if (sendState === 'sending' || sendState === 'sent') return;
+    setSendState('sending'); setSendError('');
+    try {
+      const response = await fetch('/api/brief.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: form.name, email: form.email, brief: formattedBriefText }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Unable to send. Please try again.');
+      setSendState('sent');
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      setSendState('error');
+      setSendError(error instanceof Error ? error.message : 'Unable to send. Please try again.');
+    }
+  };
 
   const handleCopySummary = async () => {
     try {
@@ -226,13 +244,13 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                 <div className="rounded-2xl bg-[#F8B033] p-5 sm:p-6 text-[#1C1D1E] ring-1 ring-inset ring-white/35">
                   <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2">
                     <Check className="w-4 h-4" />
-                    <span>Brief Validated</span>
+                    <span>{sendState === 'sent' ? 'Brief sent' : 'Brief ready to send'}</span>
                   </div>
                   <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight">
                     Thank you, {form.name}.
                   </h3>
                   <p className="mt-1.5 text-xs sm:text-sm text-black/85 leading-relaxed">
-                    Send your brief directly to {brand.email} or copy the summary below.
+                    {sendState === 'sent' ? 'Your brief has been submitted. We’ll reply to your email within 24 hours.' : 'Review your brief, then send it directly to our inbox below.'}
                   </p>
                 </div>
 
@@ -255,14 +273,15 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                  <a
-                    href={mailtoHref}
+                {sendError && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{sendError}</p>}
+                <div aria-live="polite" className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                  <button
+                    type="button" onClick={handleSendBrief} disabled={sendState === 'sending' || sendState === 'sent'}
                     className="inline-flex items-center gap-2 rounded-full bg-[#1C1D1E]/90 dark:bg-white/90 backdrop-blur-xl ring-1 ring-inset ring-white/20 dark:ring-black/10 text-white dark:text-[#1C1D1E] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold hover:bg-[#F8B033] dark:hover:bg-[#F8B033] hover:text-[#1C1D1E] hover:scale-[1.03] active:scale-[0.97] transition-all duration-350 ease-out"
                   >
                     <Mail className="w-4 h-4" />
-                    <span>Send to {brand.email}</span>
-                  </a>
+                    <span>{sendState === 'sending' ? 'Sending…' : sendState === 'sent' ? 'Brief sent ✓' : 'Send to amaan@amaanity.com'}</span>
+                  </button>
                   <button
                     type="button"
                     onClick={handleCopySummary}

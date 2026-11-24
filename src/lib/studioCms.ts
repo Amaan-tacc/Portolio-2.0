@@ -154,9 +154,9 @@ export function normalizeSiteContentBundle(
         input.brand?.instagramUrl || '',
         DEFAULT_SITE_CONTENT.brand.instagramUrl
       ),
-      githubUrl: sanitizeUrlOrAsset(
-        input.brand?.githubUrl || '',
-        DEFAULT_SITE_CONTENT.brand.githubUrl
+      linkedinUrl: sanitizeUrlOrAsset(
+        input.brand?.linkedinUrl || '',
+        DEFAULT_SITE_CONTENT.brand.linkedinUrl
       ),
     },
     copy: {

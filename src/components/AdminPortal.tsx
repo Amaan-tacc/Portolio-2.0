@@ -1784,14 +1784,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 </div>
               </div>
               <div>
-                <label className={labelClass}>GitHub URL</label>
+                <label className={labelClass}>LinkedIn URL</label>
                 <input
                   type="url"
-                  value={draftContent.brand.githubUrl}
+                  value={draftContent.brand.linkedinUrl}
                   onChange={(e) =>
                     updateDraft((p) => ({
                       ...p,
-                      brand: { ...p.brand, githubUrl: e.target.value },
+                      brand: { ...p.brand, linkedinUrl: e.target.value },
                     }))
                   }
                   className={inputClass}

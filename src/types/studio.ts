@@ -88,7 +88,7 @@ export interface StudioBrandConfig {
   founderName: string;
   founderRole: string;
   instagramUrl: string;
-  githubUrl: string;
+  linkedinUrl: string;
   logoPositive: string;
   logoNegative: string;
   founderAvatar: string;

@@ -23,7 +23,7 @@ export const STUDIO_BRAND: StudioBrandConfig = {
   founderName: 'Muhammad Amaan',
   founderRole: 'Founder & Creative Lead',
   instagramUrl: 'https://www.instagram.com/amaanity._/reels/',
-  githubUrl: 'https://github.com/Amaan-tacc',
+  linkedinUrl: 'https://www.linkedin.com/in/muhammad-amaan-79bb28204/',
   logoPositive: '/assets/amaanity/amaanity-logo-original.webp',
   logoNegative: '/assets/amaanity/amaanity-negative.png',
   founderAvatar: '/assets/amaanity/amaan-avatar.webp',

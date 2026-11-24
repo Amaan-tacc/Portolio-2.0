@@ -9,7 +9,7 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export const ADMIN_EMAILS = ['amaanityofficial@gmail.com', 'amaan@amaanity.com'];
+export const ADMIN_EMAILS = ['amaanityofficial@gmail.com', 'amaan@amaanity.com', 'hafizamaan18@gmail.com'];
 
 export enum OperationType {
   CREATE = 'create',

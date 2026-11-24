@@ -192,12 +192,12 @@ export const FooterCTA: React.FC<FooterCTAProps> = ({
               </li>
               <li>
                 <a
-                  href={brand.githubUrl}
+                  href={brand.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-[#F8B033] transition-colors duration-300 ease-out"
                 >
-                  GitHub
+                  LinkedIn
                 </a>
               </li>
             </ul>
