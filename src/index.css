@@ -93,35 +93,43 @@ html.dark .studio-dot-texture {
   background-position: 13px 13px, 0 0;
 }
 
-/* Selected Work Band: Neutral Charcoal-to-Black in Light Mode, Crisp White Canvas in Dark Mode */
+/* Selected Work Pavilion: Matching Theme Polarity with Crisp Architectural Separation */
 .studio-work-band {
-  background-color: #0e0e0f;
+  background-color: #fbfbfc;
   background-image:
-    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(255, 255, 255, 0.065), transparent 65%),
-    radial-gradient(circle at 85% 22%, rgba(248, 176, 51, 0.1), transparent 44%),
-    linear-gradient(180deg, #242426 0%, #18181a 45%, #0c0c0d 100%);
+    radial-gradient(ellipse 85% 42% at 50% 0%, rgba(255, 255, 255, 1), transparent 70%),
+    radial-gradient(circle at 86% 14%, rgba(248, 176, 51, 0.12), transparent 44%),
+    radial-gradient(circle at 14% 78%, rgba(66, 154, 212, 0.085), transparent 42%),
+    linear-gradient(180deg, #ffffff 0%, #f8f8f9 55%, #f1f1f3 100%);
+  box-shadow:
+    0 28px 75px -20px rgba(28, 29, 30, 0.12),
+    0 4px 16px -4px rgba(28, 29, 30, 0.05);
 }
 
 html.dark .studio-work-band {
-  background-color: #ffffff;
+  background-color: #0b0b0d;
   background-image:
-    radial-gradient(ellipse 85% 45% at 50% 0%, rgba(255, 255, 255, 0.96), transparent 68%),
-    radial-gradient(circle at 85% 18%, rgba(248, 176, 51, 0.11), transparent 44%),
-    linear-gradient(180deg, #ffffff 0%, #f5f5f6 52%, #ededee 100%);
+    radial-gradient(ellipse 85% 42% at 50% 0%, rgba(255, 255, 255, 0.055), transparent 65%),
+    radial-gradient(circle at 86% 16%, rgba(248, 176, 51, 0.11), transparent 44%),
+    radial-gradient(circle at 14% 78%, rgba(66, 154, 212, 0.085), transparent 42%),
+    linear-gradient(180deg, #161619 0%, #101012 50%, #09090b 100%);
+  box-shadow:
+    0 32px 90px -15px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .studio-work-band-dots {
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.2) 1px, transparent 0),
-    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.07) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.25) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(28, 29, 30, 0.08) 1px, transparent 0);
   background-size: 52px 52px, 26px 26px;
   background-position: 13px 13px, 0 0;
 }
 
 html.dark .studio-work-band-dots {
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.24) 1px, transparent 0),
-    radial-gradient(circle at 1px 1px, rgba(28, 29, 30, 0.09) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(248, 176, 51, 0.22) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.065) 1px, transparent 0);
   background-size: 52px 52px, 26px 26px;
   background-position: 13px 13px, 0 0;
 }

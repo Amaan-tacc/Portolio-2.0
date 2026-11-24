@@ -2,5 +2,7 @@
   "name": "Amaanity Studio",
   "description": "Full-service design studio specializing in brand identity, UI/UX design, book and educational publishing, print packaging, game assets, and custom illustration.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
