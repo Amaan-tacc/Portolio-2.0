@@ -1,0 +1,229 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "A portfolio case study displayed in Selected Work and filterable by specialty.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "indexNumber": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "sortOrder": {
+          "type": "number"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "client": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "niche": {
+          "type": "string",
+          "enum": [
+            "brand-identity",
+            "ui-ux",
+            "books-educational",
+            "print-packaging",
+            "game-assets",
+            "illustration"
+          ]
+        },
+        "nicheLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "roleTag": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "challenge": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1200
+        },
+        "solution": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1200
+        },
+        "outcomeMetric": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "outcomeContext": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "deliverables": {
+          "type": "array",
+          "description": "Bounded list of delivered project items (max 12)."
+        },
+        "accentHex": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 16,
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "heroImage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120000
+        },
+        "galleryImages": {
+          "type": "array",
+          "description": "Bounded list of project gallery image URLs or compact data URIs (max 12)."
+        },
+        "specs": {
+          "type": "array",
+          "description": "Bounded list of specification tags (max 10)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "indexNumber",
+        "sortOrder",
+        "title",
+        "client",
+        "niche",
+        "nicheLabel",
+        "roleTag",
+        "summary",
+        "challenge",
+        "solution",
+        "outcomeMetric",
+        "outcomeContext",
+        "deliverables",
+        "accentHex",
+        "heroImage",
+        "galleryImages",
+        "specs",
+        "updatedAt"
+      ]
+    },
+    "SiteContent": {
+      "title": "SiteContent",
+      "description": "Editable copy, brand settings, metrics, services, process steps, testimonials, and archive gallery for the Amaanity Studio portfolio.",
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "object",
+          "description": "Studio contact info, logos, founder avatar, and video URL."
+        },
+        "copy": {
+          "type": "object",
+          "description": "All editable section headings, eyebrows, subheadings, button labels, and footer text."
+        },
+        "metrics": {
+          "type": "array",
+          "description": "Four experience and client counter cards (max 8)."
+        },
+        "sectors": {
+          "type": "array",
+          "description": "Marquee capability labels (max 24)."
+        },
+        "services": {
+          "type": "array",
+          "description": "Service discipline accordion entries (max 12)."
+        },
+        "processSteps": {
+          "type": "array",
+          "description": "Four-step delivery process cards (max 8)."
+        },
+        "testimonials": {
+          "type": "array",
+          "description": "Client proof testimonial cards (max 12)."
+        },
+        "reelGallery": {
+          "type": "array",
+          "description": "Scroll-parallax archive strip cards (max 20)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "brand",
+        "copy",
+        "metrics",
+        "sectors",
+        "services",
+        "processSteps",
+        "testimonials",
+        "reelGallery",
+        "updatedAt",
+        "updatedBy"
+      ]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized studio administrator record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 254
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Publicly readable portfolio projects; writable strictly by verified studio admins."
+    },
+    "/site_content/{docId}": {
+      "schema": { "$ref": "#/entities/SiteContent" },
+      "description": "Publicly readable site CMS content document ('main'); writable strictly by verified studio admins."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Admin allowlist restricted to verified studio admins."
+    }
+  }
+}

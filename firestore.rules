@@ -1,0 +1,202 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerified() && (
+        request.auth.token.email == 'amaanityofficial@gmail.com'
+        || request.auth.token.email == 'amaan@amaanity.com'
+      );
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin()
+        || (isVerified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isValidNiche(niche) {
+      return niche in [
+        'brand-identity',
+        'ui-ux',
+        'books-educational',
+        'print-packaging',
+        'game-assets',
+        'illustration'
+      ];
+    }
+
+    function isValidStringArray(arr, minItems, maxItems) {
+      return arr is list
+        && arr.size() >= minItems
+        && arr.size() <= maxItems
+        && (arr.size() == 0 || arr[0] is string);
+    }
+
+    function isValidProject(data, docId) {
+      return data.keys().hasAll([
+          'id', 'indexNumber', 'sortOrder', 'title', 'client', 'niche', 'nicheLabel',
+          'roleTag', 'summary', 'challenge', 'solution', 'outcomeMetric',
+          'outcomeContext', 'deliverables', 'accentHex', 'heroImage',
+          'galleryImages', 'specs', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'indexNumber', 'sortOrder', 'title', 'client', 'niche', 'nicheLabel',
+          'roleTag', 'summary', 'challenge', 'solution', 'outcomeMetric',
+          'outcomeContext', 'deliverables', 'accentHex', 'heroImage',
+          'galleryImages', 'specs', 'updatedAt'
+        ])
+        && data.id == docId
+        && isValidId(data.id)
+        && isValidString(data.indexNumber, 1, 16)
+        && data.sortOrder is number
+        && data.sortOrder >= 0
+        && data.sortOrder <= 10000
+        && isValidString(data.title, 1, 160)
+        && isValidString(data.client, 1, 160)
+        && isValidNiche(data.niche)
+        && isValidString(data.nicheLabel, 1, 80)
+        && isValidString(data.roleTag, 1, 120)
+        && isValidString(data.summary, 1, 600)
+        && isValidString(data.challenge, 1, 1200)
+        && isValidString(data.solution, 1, 1200)
+        && isValidString(data.outcomeMetric, 1, 200)
+        && isValidString(data.outcomeContext, 1, 400)
+        && isValidStringArray(data.deliverables, 1, 12)
+        && data.accentHex is string
+        && data.accentHex.size() >= 4
+        && data.accentHex.size() <= 16
+        && data.accentHex.matches('^#[0-9a-fA-F]{3,8}$')
+        && isValidString(data.heroImage, 1, 120000)
+        && isValidStringArray(data.galleryImages, 1, 12)
+        && isValidStringArray(data.specs, 1, 10)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSiteContent(data) {
+      return data.keys().hasAll([
+          'brand', 'copy', 'metrics', 'sectors', 'services',
+          'processSteps', 'testimonials', 'reelGallery', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'brand', 'copy', 'metrics', 'sectors', 'services',
+          'processSteps', 'testimonials', 'reelGallery', 'updatedAt', 'updatedBy'
+        ])
+        && data.brand is map && data.brand.keys().size() <= 30
+        && data.copy is map && data.copy.keys().size() <= 60
+        && data.metrics is list && data.metrics.size() >= 1 && data.metrics.size() <= 8
+        && data.sectors is list && data.sectors.size() >= 1 && data.sectors.size() <= 24
+        && data.services is list && data.services.size() >= 1 && data.services.size() <= 12
+        && data.processSteps is list && data.processSteps.size() >= 1 && data.processSteps.size() <= 8
+        && data.testimonials is list && data.testimonials.size() >= 0 && data.testimonials.size() <= 12
+        && data.reelGallery is list && data.reelGallery.size() >= 0 && data.reelGallery.size() <= 20
+        && data.updatedAt is timestamp
+        && isValidId(data.updatedBy);
+    }
+
+    function isValidAdminUser(data, adminId) {
+      return data.keys().hasAll(['uid', 'email', 'role', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'email', 'role', 'createdAt'])
+        && data.uid == adminId
+        && isValidId(data.uid)
+        && isValidString(data.email, 3, 254)
+        && data.role == 'admin'
+        && data.createdAt is timestamp;
+    }
+
+    // Public connection health-check probe (no sensitive data)
+    match /test/{docId} {
+      allow get: if docId == 'connection';
+      allow list, write: if false;
+    }
+
+    // Portfolio Projects: Publicly readable for website visitors, Admin-only writes
+    match /projects/{projectId} {
+      allow get: if isValidId(projectId);
+      allow list: if true;
+      allow create: if isAdmin()
+        && isValidId(projectId)
+        && isValidProject(incoming(), projectId)
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(projectId)
+        && isValidProject(incoming(), projectId)
+        && incoming().id == existing().id
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'indexNumber', 'sortOrder', 'title', 'client', 'niche', 'nicheLabel',
+          'roleTag', 'summary', 'challenge', 'solution', 'outcomeMetric',
+          'outcomeContext', 'deliverables', 'accentHex', 'heroImage',
+          'galleryImages', 'specs', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(projectId);
+    }
+
+    // Site Copy, Brand, Metrics, Services, Process, Reviews & Reel Archive
+    match /site_content/{docId} {
+      allow get: if isValidId(docId) && docId == 'main';
+      allow list: if false;
+      allow create: if isAdmin()
+        && isValidId(docId)
+        && docId == 'main'
+        && isValidSiteContent(incoming())
+        && incoming().updatedBy == request.auth.uid
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(docId)
+        && docId == 'main'
+        && isValidSiteContent(incoming())
+        && incoming().updatedBy == request.auth.uid
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'brand', 'copy', 'metrics', 'sectors', 'services',
+          'processSteps', 'testimonials', 'reelGallery', 'updatedAt', 'updatedBy'
+        ]);
+      allow delete: if false;
+    }
+
+    // Studio Admin Allowlist
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId)
+        && isVerified()
+        && (request.auth.uid == adminId || isBootstrappedAdmin());
+      allow list: if false;
+      allow create: if isBootstrappedAdmin()
+        && isValidId(adminId)
+        && isValidAdminUser(incoming(), adminId)
+        && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if isBootstrappedAdmin()
+        && isValidId(adminId)
+        && adminId != request.auth.uid;
+    }
+  }
+}

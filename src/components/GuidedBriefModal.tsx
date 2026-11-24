@@ -2,12 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowUpRight, Check, Copy, Mail, X } from 'lucide-react';
 import { SERVICE_DISCIPLINES, STUDIO_BRAND } from '../data/studioData';
-import { NicheId, ProjectBriefForm } from '../types/studio';
+import {
+  NicheId,
+  ProjectBriefForm,
+  ServiceDiscipline,
+  StudioBrandConfig,
+} from '../types/studio';
 
 interface GuidedBriefModalProps {
   isOpen: boolean;
   prefilledNiche: NicheId | null;
   onClose: () => void;
+  brand?: StudioBrandConfig;
+  services?: ServiceDiscipline[];
 }
 
 const STORAGE_KEY = 'amaanity_studio_brief_draft_v3';
@@ -30,6 +37,8 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
   isOpen,
   prefilledNiche,
   onClose,
+  brand = STUDIO_BRAND,
+  services = SERVICE_DISCIPLINES,
 }) => {
   const [form, setForm] = useState<ProjectBriefForm>(() => {
     try {
@@ -132,7 +141,9 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
   const resolvedBudget =
     form.budget === 'Custom' ? `Custom (${form.customBudget.trim()})` : form.budget;
 
-  const selectedLabels = SERVICE_DISCIPLINES.filter((d) => form.niches.includes(d.id))
+  const activeServices = services.length > 0 ? services : SERVICE_DISCIPLINES;
+  const selectedLabels = activeServices
+    .filter((d) => form.niches.includes(d.id))
     .map((d) => d.title)
     .join(', ');
 
@@ -148,7 +159,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
     .filter(Boolean)
     .join('\n');
 
-  const mailtoHref = `mailto:${STUDIO_BRAND.email}?subject=${encodeURIComponent(
+  const mailtoHref = `mailto:${brand.email}?subject=${encodeURIComponent(
     `Project Brief — ${selectedLabels || 'Design Inquiry'} (${form.name})`
   )}&body=${encodeURIComponent(formattedBriefText)}`;
 
@@ -177,7 +188,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md"
+            className="fixed inset-0 bg-black/65 backdrop-blur-xl"
           />
 
           <motion.div
@@ -185,15 +196,15 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 18 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[28px] bg-white/95 dark:bg-[#191B1E]/95 backdrop-blur-2xl text-[#1C1D1E] dark:text-white shadow-2xl border border-[#DEDEDE] dark:border-white/12"
+            className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] sm:rounded-[28px] bg-white/88 dark:bg-[#191B1E]/88 backdrop-blur-2xl text-[#1C1D1E] dark:text-white shadow-2xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/45 dark:ring-white/10"
           >
             {/* Translucent Header */}
-            <div className="sticky top-0 z-20 bg-white/75 dark:bg-[#191B1E]/75 backdrop-blur-xl px-5 sm:px-8 py-4 sm:py-5 border-b border-[#DEDEDE] dark:border-white/10 flex items-center justify-between gap-4">
+            <div className="sticky top-0 z-20 bg-white/72 dark:bg-[#191B1E]/74 backdrop-blur-2xl px-4 sm:px-8 py-3.5 sm:py-5 border-b border-black/10 dark:border-white/10 flex items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-widest text-[#68696A] dark:text-white/55">
+                <div className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-[#68696A] dark:text-white/55">
                   Amaanity Studio · Brief
                 </div>
-                <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight mt-0.5">
+                <h2 className="font-display text-lg sm:text-2xl font-bold tracking-tight mt-0.5">
                   {submitted ? 'Project Brief Ready' : 'Start a Project'}
                 </h2>
               </div>
@@ -201,31 +212,31 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                 type="button"
                 whileHover={{ scale: 1.08, rotate: 90 }}
                 whileTap={{ scale: 0.92 }}
-                transition={{ duration: 0.2 }}
+                transition={{ type: 'spring', stiffness: 280, damping: 22 }}
                 onClick={onClose}
                 aria-label="Close project brief modal"
-                className="w-9 h-9 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-md border border-[#DEDEDE] dark:border-white/15 flex items-center justify-center hover:bg-[#1C1D1E] dark:hover:bg-white hover:text-white dark:hover:text-[#1C1D1E] transition-colors cursor-pointer"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/55 dark:bg-white/10 backdrop-blur-xl border border-black/10 dark:border-white/15 ring-1 ring-inset ring-white/45 dark:ring-white/10 flex items-center justify-center hover:bg-[#1C1D1E] dark:hover:bg-white hover:text-white dark:hover:text-[#1C1D1E] transition-colors duration-300 ease-out cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </motion.button>
             </div>
 
             {submitted ? (
-              <div className="p-5 sm:p-8 space-y-6">
-                <div className="rounded-2xl bg-[#F8B033] p-6 text-[#1C1D1E]">
+              <div className="p-4 sm:p-8 space-y-5 sm:space-y-6">
+                <div className="rounded-2xl bg-[#F8B033] p-5 sm:p-6 text-[#1C1D1E] ring-1 ring-inset ring-white/35">
                   <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2">
                     <Check className="w-4 h-4" />
                     <span>Brief Validated</span>
                   </div>
-                  <h3 className="font-display text-2xl font-bold tracking-tight">
+                  <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight">
                     Thank you, {form.name}.
                   </h3>
-                  <p className="mt-1.5 text-sm text-black/85 leading-relaxed">
-                    Send your brief directly to {STUDIO_BRAND.email} or copy the summary below.
+                  <p className="mt-1.5 text-xs sm:text-sm text-black/85 leading-relaxed">
+                    Send your brief directly to {brand.email} or copy the summary below.
                   </p>
                 </div>
 
-                <div className="rounded-2xl bg-[#F4F4F4] dark:bg-white/6 border border-[#DEDEDE] dark:border-white/12 p-5 space-y-2 text-sm">
+                <div className="rounded-2xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-xl border border-black/10 dark:border-white/12 ring-1 ring-inset ring-white/45 dark:ring-white/10 p-4 sm:p-5 space-y-2 text-xs sm:text-sm">
                   <div className="flex justify-between gap-4">
                     <span className="text-[#68696A] dark:text-white/55">Specialties</span>
                     <span className="font-semibold text-right">{selectedLabels}</span>
@@ -244,18 +255,18 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                   <a
                     href={mailtoHref}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#1C1D1E] dark:bg-white text-white dark:text-[#1C1D1E] px-6 py-3 text-sm font-semibold hover:bg-[#F8B033] dark:hover:bg-[#F8B033] hover:text-[#1C1D1E] transition-colors"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#1C1D1E]/90 dark:bg-white/90 backdrop-blur-xl ring-1 ring-inset ring-white/20 dark:ring-black/10 text-white dark:text-[#1C1D1E] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold hover:bg-[#F8B033] dark:hover:bg-[#F8B033] hover:text-[#1C1D1E] hover:scale-[1.03] active:scale-[0.97] transition-all duration-350 ease-out"
                   >
                     <Mail className="w-4 h-4" />
-                    <span>Send to {STUDIO_BRAND.email}</span>
+                    <span>Send to {brand.email}</span>
                   </a>
                   <button
                     type="button"
                     onClick={handleCopySummary}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#DEDEDE] dark:border-white/15 px-5 py-3 text-sm font-semibold hover:bg-[#F4F4F4] dark:hover:bg-white/10 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/55 dark:bg-white/[0.07] backdrop-blur-xl border border-black/10 dark:border-white/14 ring-1 ring-inset ring-white/45 dark:ring-white/10 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold hover:bg-white/85 dark:hover:bg-white/16 active:scale-95 transition-all duration-300 ease-out cursor-pointer"
                   >
                     {copiedSummary ? (
                       <>
@@ -272,30 +283,30 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setSubmitted(false)}
-                    className="text-sm font-medium text-[#68696A] dark:text-white/60 hover:text-[#1C1D1E] dark:hover:text-white px-2 py-2 cursor-pointer"
+                    className="text-xs sm:text-sm font-medium text-[#68696A] dark:text-white/60 hover:text-[#1C1D1E] dark:hover:text-white transition-colors duration-300 ease-out px-2 py-2 cursor-pointer"
                   >
                     Edit Details
                   </button>
                 </div>
               </div>
             ) : (
-              <form onSubmit={validateAndSubmit} className="p-5 sm:p-8 space-y-6" noValidate>
+              <form onSubmit={validateAndSubmit} className="p-4 sm:p-8 space-y-5 sm:space-y-6" noValidate>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#68696A] dark:text-white/55 mb-2.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#68696A] dark:text-white/55 mb-2">
                     1. Specialties *
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {SERVICE_DISCIPLINES.map((service) => {
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {activeServices.map((service) => {
                       const selected = form.niches.includes(service.id);
                       return (
                         <button
                           key={service.id}
                           type="button"
                           onClick={() => toggleNiche(service.id)}
-                          className={`flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium border transition-colors cursor-pointer ${
+                          className={`flex items-center justify-between gap-3 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-left text-xs sm:text-sm font-medium border backdrop-blur-xl ring-1 ring-inset transition-all duration-300 ease-out cursor-pointer ${
                             selected
-                              ? 'bg-[#1C1D1E] dark:bg-white text-white dark:text-[#1C1D1E] border-transparent'
-                              : 'bg-white/70 dark:bg-white/5 text-[#1C1D1E] dark:text-white border-[#DEDEDE] dark:border-white/12 hover:border-[#434445] dark:hover:border-white/35'
+                              ? 'bg-[#1C1D1E]/90 dark:bg-white/92 text-white dark:text-[#1C1D1E] border-transparent ring-white/20 dark:ring-black/10'
+                              : 'bg-white/58 dark:bg-white/[0.06] text-[#1C1D1E] dark:text-white border-black/10 dark:border-white/12 ring-white/45 dark:ring-white/10 hover:border-[#434445] dark:hover:border-white/35'
                           }`}
                         >
                           <span>{service.title}</span>
@@ -311,9 +322,9 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68696A] dark:text-white/55 mb-2.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68696A] dark:text-white/55 mb-2">
                       2. Timeline
                     </label>
                     <div className="space-y-2">
@@ -322,10 +333,10 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                           key={option}
                           type="button"
                           onClick={() => setForm((prev) => ({ ...prev, timeline: option }))}
-                          className={`w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium border transition-colors cursor-pointer tabular-nums ${
+                          className={`w-full rounded-xl px-3.5 sm:px-4 py-2 sm:py-2.5 text-left text-xs sm:text-sm font-medium border backdrop-blur-xl ring-1 ring-inset transition-all duration-300 ease-out cursor-pointer tabular-nums ${
                             form.timeline === option
-                              ? 'bg-[#F4F4F4] dark:bg-white/15 border-[#1C1D1E] dark:border-[#F8B033] text-[#1C1D1E] dark:text-white font-semibold'
-                              : 'bg-white/60 dark:bg-white/5 border-[#DEDEDE] dark:border-white/12 text-[#68696A] dark:text-white/65 hover:border-[#434445]'
+                              ? 'bg-white/85 dark:bg-white/14 border-[#1C1D1E] dark:border-[#F8B033] ring-white/50 dark:ring-white/15 text-[#1C1D1E] dark:text-white font-semibold'
+                              : 'bg-white/55 dark:bg-white/[0.05] border-black/10 dark:border-white/12 ring-white/40 dark:ring-white/10 text-[#68696A] dark:text-white/65 hover:border-[#434445]'
                           }`}
                         >
                           {option}
@@ -335,7 +346,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68696A] dark:text-white/55 mb-2.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68696A] dark:text-white/55 mb-2">
                       3. Budget
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -352,12 +363,12 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                                 setErrors((prev) => ({ ...prev, customBudget: undefined }));
                               }
                             }}
-                            className={`rounded-xl px-3 py-2.5 text-left text-sm font-medium border transition-colors cursor-pointer tabular-nums ${
+                            className={`rounded-xl px-3 py-2 sm:py-2.5 text-left text-xs sm:text-sm font-medium border backdrop-blur-xl ring-1 ring-inset transition-all duration-300 ease-out cursor-pointer tabular-nums ${
                               isCustom ? 'col-span-2' : ''
                             } ${
                               active
-                                ? 'bg-[#F4F4F4] dark:bg-white/15 border-[#1C1D1E] dark:border-[#F8B033] text-[#1C1D1E] dark:text-white font-semibold'
-                                : 'bg-white/60 dark:bg-white/5 border-[#DEDEDE] dark:border-white/12 text-[#68696A] dark:text-white/65 hover:border-[#434445]'
+                                ? 'bg-white/85 dark:bg-white/14 border-[#1C1D1E] dark:border-[#F8B033] ring-white/50 dark:ring-white/15 text-[#1C1D1E] dark:text-white font-semibold'
+                                : 'bg-white/55 dark:bg-white/[0.05] border-black/10 dark:border-white/12 ring-white/40 dark:ring-white/10 text-[#68696A] dark:text-white/65 hover:border-[#434445]'
                             }`}
                           >
                             {option === 'Custom' ? 'Custom Budget Amount' : option}
@@ -386,7 +397,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                                 }
                               }}
                               placeholder="Enter custom value (e.g. $800 or $22k)"
-                              className="w-full rounded-xl border border-[#1C1D1E] dark:border-[#F8B033] bg-white dark:bg-[#141517] px-3.5 py-2.5 text-sm text-[#1C1D1E] dark:text-white focus:outline-none tabular-nums"
+                              className="w-full rounded-xl border border-[#1C1D1E] dark:border-[#F8B033] bg-white/80 dark:bg-white/[0.06] backdrop-blur-md px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-[#1C1D1E] dark:text-white focus:outline-none tabular-nums"
                             />
                             {errors.customBudget && (
                               <p className="mt-1 text-xs font-medium text-red-500">
@@ -400,7 +411,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                   <div>
                     <label
                       htmlFor="brief-name"
@@ -417,7 +428,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                         if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
                       }}
                       placeholder="Your name"
-                      className="w-full rounded-xl border border-[#DEDEDE] dark:border-white/15 bg-white dark:bg-[#141517] px-4 py-2.5 text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
+                      className="w-full rounded-xl border border-black/12 dark:border-white/14 bg-white/70 dark:bg-white/[0.05] backdrop-blur-md px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
                     />
                     {errors.name && (
                       <p className="mt-1 text-xs font-medium text-red-500">{errors.name}</p>
@@ -440,7 +451,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                         if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
                       }}
                       placeholder="you@company.com"
-                      className="w-full rounded-xl border border-[#DEDEDE] dark:border-white/15 bg-white dark:bg-[#141517] px-4 py-2.5 text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
+                      className="w-full rounded-xl border border-black/12 dark:border-white/14 bg-white/70 dark:bg-white/[0.05] backdrop-blur-md px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
                     />
                     {errors.email && (
                       <p className="mt-1 text-xs font-medium text-red-500">{errors.email}</p>
@@ -461,7 +472,7 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                     value={form.organization}
                     onChange={(e) => setForm((prev) => ({ ...prev, organization: e.target.value }))}
                     placeholder="Organization name"
-                    className="w-full rounded-xl border border-[#DEDEDE] dark:border-white/15 bg-white dark:bg-[#141517] px-4 py-2.5 text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
+                    className="w-full rounded-xl border border-black/12 dark:border-white/14 bg-white/70 dark:bg-white/[0.05] backdrop-blur-md px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
                   />
                 </div>
 
@@ -478,22 +489,23 @@ export const GuidedBriefModal: React.FC<GuidedBriefModalProps> = ({
                     value={form.details}
                     onChange={(e) => setForm((prev) => ({ ...prev, details: e.target.value }))}
                     placeholder="Pages, SKUs, asset count or launch dates..."
-                    className="w-full rounded-xl border border-[#DEDEDE] dark:border-white/15 bg-white dark:bg-[#141517] px-4 py-2.5 text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
+                    className="w-full rounded-xl border border-black/12 dark:border-white/14 bg-white/70 dark:bg-white/[0.05] backdrop-blur-md px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-[#1C1D1E] dark:text-white focus:outline-none focus:border-[#1C1D1E] dark:focus:border-[#F8B033]"
                   />
                 </div>
 
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-4 border-t border-[#DEDEDE] dark:border-white/12">
+                <div className="pt-3 flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-t border-black/10 dark:border-white/12">
                   <span className="text-xs text-[#68696A] dark:text-white/55">
-                    Reply from {STUDIO_BRAND.email} within 24h
+                    Reply from {brand.email} within 24h
                   </span>
                   <motion.button
                     type="submit"
-                    whileHover={{ scale: 1.03 }}
+                    whileHover={{ scale: 1.03, y: -1 }}
                     whileTap={{ scale: 0.96 }}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#1C1D1E]/90 dark:bg-white/90 backdrop-blur-md text-white dark:text-[#1C1D1E] px-7 py-3 text-sm font-semibold hover:bg-[#F8B033] dark:hover:bg-[#F8B033] hover:text-[#1C1D1E] transition-colors cursor-pointer"
+                    transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+                    className="group inline-flex items-center gap-2 rounded-full bg-[#1C1D1E]/90 dark:bg-white/92 backdrop-blur-xl ring-1 ring-inset ring-white/20 dark:ring-black/10 text-white dark:text-[#1C1D1E] px-6 sm:px-7 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold hover:bg-[#F8B033] dark:hover:bg-[#F8B033] hover:text-[#1C1D1E] transition-colors duration-350 ease-out cursor-pointer"
                   >
                     <span>Generate Project Brief</span>
-                    <ArrowUpRight className="w-4 h-4" />
+                    <ArrowUpRight className="w-4 h-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </motion.button>
                 </div>
               </form>

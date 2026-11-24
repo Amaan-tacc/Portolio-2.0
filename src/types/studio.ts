@@ -1,5 +1,6 @@
 export type NicheId =
   | 'brand-identity'
+  | 'ui-ux'
   | 'books-educational'
   | 'print-packaging'
   | 'game-assets'
@@ -23,6 +24,7 @@ export interface StudioMetric {
 export interface CaseStudy {
   id: string;
   indexNumber: string;
+  sortOrder?: number;
   title: string;
   client: string;
   niche: NicheId;
@@ -72,6 +74,74 @@ export interface ReelVisualItem {
   nicheLabel: string;
   image: string;
   caseStudyId: string;
+}
+
+export interface StudioBrandConfig {
+  name: string;
+  fullName: string;
+  domain: string;
+  email: string;
+  secondaryEmail: string;
+  phone: string;
+  whatsappUrl: string;
+  location: string;
+  founderName: string;
+  founderRole: string;
+  instagramUrl: string;
+  githubUrl: string;
+  logoPositive: string;
+  logoNegative: string;
+  founderAvatar: string;
+  introVideoUrl: string;
+}
+
+export interface SiteCopyConfig {
+  heroEyebrow: string;
+  heroHeadingMain: string;
+  heroHeadingHighlight: string;
+  heroHeadingHighlightRoll: string;
+  heroSubtitle: string;
+  heroPrimaryCta: string;
+  heroSecondaryCta: string;
+  heroScrollLabel: string;
+  videoBadgeLabel: string;
+  videoEyebrow: string;
+  videoHeadline: string;
+  videoCtaLabel: string;
+  manifestoText: string;
+  workEyebrow: string;
+  workHeading: string;
+  reelEyebrow: string;
+  reelHeading: string;
+  reelSubtext: string;
+  specialtiesEyebrow: string;
+  specialtiesHeading: string;
+  specialtiesSubtitle: string;
+  aboutEyebrow: string;
+  aboutHeading: string;
+  aboutBody: string;
+  aboutFocusLabel: string;
+  aboutFocusText: string;
+  processEyebrow: string;
+  processHeading: string;
+  reviewsEyebrow: string;
+  reviewsHeading: string;
+  footerEyebrow: string;
+  footerCtaPhrase: string;
+  footerCtaPhraseRoll: string;
+  footerSubtitle: string;
+  footerTagline: string;
+}
+
+export interface SiteContentBundle {
+  brand: StudioBrandConfig;
+  copy: SiteCopyConfig;
+  metrics: StudioMetric[];
+  sectors: string[];
+  services: ServiceDiscipline[];
+  processSteps: ProcessStep[];
+  testimonials: Testimonial[];
+  reelGallery: ReelVisualItem[];
 }
 
 export interface ProjectBriefForm {
