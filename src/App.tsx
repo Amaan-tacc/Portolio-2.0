@@ -25,9 +25,9 @@ export default function App() {
       const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
       if (saved === 'dark') return true;
       if (saved === 'light') return false;
-      return false;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
     } catch {
-      return false;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
   });
 

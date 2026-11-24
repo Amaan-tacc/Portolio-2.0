@@ -32,6 +32,7 @@ export const FooterCTA: React.FC<FooterCTAProps> = ({ onOpenBrief }) => {
 
   return (
     <motion.footer
+      id="contact"
       ref={footerRef}
       style={{ scale: footerScale, y: footerY }}
       className="relative overflow-clip studio-dark-band text-white rounded-t-[32px] md:rounded-t-[56px] pt-16 sm:pt-24 pb-28 md:pb-10 origin-bottom will-change-transform border-t border-white/10"

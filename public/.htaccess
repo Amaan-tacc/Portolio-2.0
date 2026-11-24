@@ -1,0 +1,22 @@
+DirectoryIndex index.html index.php
+ErrorDocument 404 /404.html
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\.amaanity\.com$ [NC]
+RewriteRule ^ https://amaanity.com%{REQUEST_URI} [R=301,L]
+# Retain incoming links to the previous portfolio after the one-page migration.
+RewriteRule ^contact(?:/index\.html)?/?$ /#contact [R=301,L,NE]
+RewriteRule ^about(?:/index\.html)?/?$ /#about [R=301,L,NE]
+RewriteRule ^work(?:/index\.html)?/?$ /#work [R=301,L,NE]
+RewriteRule ^services(?:/.*)?$ /#specialties [R=301,L,NE]
+RewriteRule ^projects(?:/.*)?$ /#work [R=301,L,NE]
+RewriteRule ^project(?:/index\.html)?/?$ /#work [R=301,L,NE,QSD]
+</IfModule>
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/webp "access plus 1 month"
+ExpiresByType image/png "access plus 1 month"
+ExpiresByType image/jpeg "access plus 1 month"
+ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
