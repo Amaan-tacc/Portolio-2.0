@@ -1,3 +1,4 @@
+import { ProcessFlow } from './ProcessFlow';
 import { responsiveImage } from '../lib/responsiveImage';
 import React, { useRef, useState } from 'react';
 import {
@@ -50,8 +51,6 @@ export const ExpertiseAndProcess: React.FC<ExpertiseAndProcessProps> = ({
   });
   const smoothAboutScroll = useSpring(aboutScroll, { stiffness: 100, damping: 24 });
   const avatarImgY = useTransform(smoothAboutScroll, [0, 1], [6, 0]);
-  const oddStepY = useTransform(smoothAboutScroll, [0, 1], [16, -16]);
-  const evenStepY = useTransform(smoothAboutScroll, [0, 1], [-12, 20]);
 
   return (
     <div className="bg-transparent text-[#1C1D1E] dark:text-white transition-colors duration-500">
@@ -262,46 +261,11 @@ export const ExpertiseAndProcess: React.FC<ExpertiseAndProcessProps> = ({
                 {copy.processEyebrow}
               </div>
               <h2 className="font-display text-[clamp(1.85rem,4vw,3.1rem)] font-bold leading-[1.05] tracking-[-0.03em]">
-                {copy.processHeading}
+                {copy.processHeading === 'Brief to handoff in four steps.' ? 'From brief to final files.' : copy.processHeading}
               </h2>
             </motion.div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-              {processSteps.map((step, index) => (
-                <motion.div
-                  key={step.step}
-                  style={{ y: index % 2 === 0 ? oddStepY : evenStepY }}
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  whileHover={{ y: -6, scale: 1.02 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{
-                    opacity: { duration: 0.45, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] },
-                    scale: { type: 'spring', stiffness: 300, damping: 24 },
-                  }}
-                  className="rounded-[20px] sm:rounded-3xl bg-white/62 dark:bg-white/[0.06] backdrop-blur-2xl border border-black/10 dark:border-white/12 ring-1 ring-inset ring-white/45 dark:ring-white/10 p-4 sm:p-6 flex flex-col justify-between shadow-xs hover:shadow-xl transition-shadow duration-300 will-change-transform"
-                >
-                  <div>
-                    <div
-                      className={`font-display text-2xl sm:text-3xl font-bold tracking-tight tabular-nums mb-2 sm:mb-3 ${
-                        index % 2 === 0 ? 'text-[#F8B033]' : 'text-[#429AD4]'
-                      }`}
-                    >
-                      {step.step}
-                    </div>
-                    <h3 className="font-display text-base sm:text-xl font-bold tracking-tight mb-1.5 sm:mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[#434445] dark:text-white/70 leading-snug sm:leading-normal">
-                      {step.description}
-                    </p>
-                  </div>
-                  <div className="mt-3.5 sm:mt-5 pt-2.5 sm:pt-3 border-t border-black/10 dark:border-white/12 text-[11px] sm:text-xs font-semibold text-[#1C1D1E] dark:text-white/90">
-                    {step.handoffNote}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <ProcessFlow steps={processSteps} />
           </div>
         </div>
       </section>
