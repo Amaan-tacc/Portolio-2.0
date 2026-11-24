@@ -1,3 +1,4 @@
+import { ReviewRows } from './ReviewRows';
 import { ProcessFlow } from './ProcessFlow';
 import { responsiveImage } from '../lib/responsiveImage';
 import React, { useRef, useState } from 'react';
@@ -288,36 +289,7 @@ export const ExpertiseAndProcess: React.FC<ExpertiseAndProcessProps> = ({
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            {testimonials.map((review, index) => (
-              <motion.blockquote
-                key={review.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -6 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{
-                  opacity: { duration: 0.45, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] },
-                  y: { type: 'spring', stiffness: 320, damping: 24 },
-                }}
-                className="rounded-[22px] sm:rounded-3xl border border-black/10 dark:border-white/12 ring-1 ring-inset ring-white/45 dark:ring-white/10 p-5 sm:p-7 flex flex-col justify-between bg-white/62 dark:bg-white/[0.06] backdrop-blur-2xl shadow-xs hover:shadow-xl transition-shadow duration-300"
-              >
-                <div>
-                  <div className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#68696A] dark:text-white/50 mb-2.5 sm:mb-3">
-                    {review.scope}
-                  </div>
-                  <p className="text-sm sm:text-base font-medium leading-relaxed text-[#1C1D1E] dark:text-white/90">
-                    “{review.quote}”
-                  </p>
-                </div>
-
-                <footer className="mt-5 sm:mt-7 pt-3 sm:pt-4 border-t border-black/10 dark:border-white/12">
-                  <div className="text-sm font-bold text-[#1C1D1E] dark:text-white">{review.author}</div>
-                  <div className="text-xs text-[#68696A] dark:text-white/55 mt-0.5">{review.role}</div>
-                </footer>
-              </motion.blockquote>
-            ))}
-          </div>
+          <ReviewRows reviews={testimonials} />
         </div>
       </section>
     </div>
